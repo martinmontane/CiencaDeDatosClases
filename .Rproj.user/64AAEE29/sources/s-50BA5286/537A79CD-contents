@@ -1,0 +1,250 @@
+---
+title: "Introducción a la Ciencia de Datos"
+subtitle: "Visualizaciones de datos en R"
+author: "Martín Montané"
+date: "Universidad Torcuato Di Tella (UTDT) | FEPP"
+output:
+  xaringan::moon_reader:
+    css: [default, metropolis, metropolis-fonts]
+    lib_dir: docs/libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      highlightSpans: false
+      countIncrementalSlides: false
+---
+
+```{css, echo=FALSE}
+# CSS for including pauses in printed PDF output (see bottom of lecture)
+@media print {
+  .has-continuation {
+    display: block !important;
+  }
+}
+.large4 { font-size: 400% }
+.large2 { font-size: 200% }
+.small90 { font-size: 90% }
+.small75 { font-size: 75% }
+```
+
+
+# Nuestro camino
+.center[.middle[
+1. [¿Qué es una visualización de datos?](#whatdataviz)
+
+2. [Ejemplos de algunas visualizaciones famosas](#examplesdataviz)
+
+3. [¿Qué hace buena a una visualización de datos?](#gooddataviz)
+
+4. [Nuestro aliado para gráficos: ggplot](#ggplot)
+
+5. [Introducción práctica a ggplot2](#ggplotlibro)
+
+6. [Visualizaciones en R: más allá de ggplot](#extensionesviz)
+]]
+---
+class: inverse, center, middle
+name: whatdataviz
+
+# ¿Qué es una visualización de datos?
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>
+
+---
+
+
+#  ¿Qué es una visualización de datos? 
+
+- No es una definición exenta de dificultades.
+
+> "Una <b>visualización de datos</b> es una exhibición de datos diseñada para permitir el análisis, la exploración o el descubrimiento"
+> `r tufte::quote_footer('--- Alberto Cairo')`
+
+- Existen muchas más definiciones, pero al final del día hacemos visualizaciones para
+  * *Comunicar* patrones interesantes
+  * *Alentar el descubrimiento y exploracion* de un conjunto de datos
+  * *Detectar patrones en nuestos datos*
+  * *Entender nuestros modelos*
+
+
+---
+class: inverse, center, middle
+name: examplesdataviz
+
+# Ejemplos de visualizaciones de datos
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>
+
+---
+#  Ejemplo: Napoleón en Rusia
+
+.center[.middle[
+```{r echo=FALSE}
+knitr::include_graphics("http://worldofanalytics.be/upload/images/Minard.jpg")
+```
+]
+]
+---
+#  Ejemplo: Palo de hockey
+.center[.middle[
+```{r echo=FALSE}
+knitr::include_graphics("https://fromtone.com/wp-content/uploads/2019/04/hockeystick-1.jpg")
+```
+]
+]
+---
+
+#  Ejemplo: Elephant graph
+.center[.middle[
+```{r echo=FALSE}
+knitr::include_graphics("https://ichef.bbci.co.uk/news/624/cpsprodpb/71AE/production/_91520192_elephant_chart624_arrow.png")
+```
+]
+]
+---
+
+#  Ejemplo: Elephant graph
+.center[.middle[
+```{r echo=FALSE}
+knitr::include_graphics("https://ichef.bbci.co.uk/news/624/cpsprodpb/71AE/production/_91520192_elephant_chart624_arrow.png")
+```
+]
+]
+---
+
+#  Ejemplo: COVID/19 FT
+.center[.middle[
+```{r echo=FALSE}
+knitr::include_graphics("https://chezvoila.com/wp-content/uploads/2020/04/FT-Deaths.jpg")
+```
+]
+]
+---
+
+#  Ejemplo: Impacto del COVID
+.center[.middle[
+```{r echo=FALSE}
+knitr::include_graphics("https://pbs.twimg.com/media/EXvJRl1UEAEbur5?format=jpg&name=small")
+```
+]
+]
+---
+class: inverse, center, middle
+name: gooddataviz
+
+# ¿Qué hace buena a una visualización de datos?
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>
+
+---
+
+# ¿Qué hace buena a una visualización?
+
+- Es una pregunta ambiciosa: no existe un claro consenso en qué hace a una visualizacón de datos "buena", pero vamos a basarnos en algunos conceptos que Cairo nos brinda [en su libro](https://www.amazon.es/Truthful-Art-Data-Charts-Communication/dp/0321934075)
+
+- Según Cairo (y Enrico Bertini), una visualización es éxitosa porque es:
+
+ * **veraz**: no debe esconder información y ser el resultado de un análisis/investigación "honesto"
+ * **funcional**: debe permitir a los usuarios entenderlo de la manera más simple posible
+ * **atractiva**: una visualización debe buscar atraer la atención mediante un buen diseño estético
+ * **perspicaz**: muestra evidencia que sería difícil de ver de otra manera
+ * **esclarecedora**: nos da evidencia nueva sobre el tema que se analiza
+
+---
+
+# Cuando no se cumple la veracidad
+.center[.middle[
+```{r echo=FALSE}
+knitr::include_graphics("https://pbs.twimg.com/media/EXiOhQ-WkAEjcxF?format=jpg&name=4096x4096")
+```
+]
+]
+---
+
+# Cuando no se cumple la veracidad (cont)
+.center[.middle[
+```{r echo=FALSE}
+knitr::include_graphics("https://pbs.twimg.com/media/D3vqUMnWkAAIcIU?format=jpg&name=small")
+```
+]
+]
+---
+class: inverse, center, middle
+name: ggplot
+
+# GGPLOT: Grammar of Graphics
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>
+
+---
+
+# GGPLOT: Grammar of Graphics
+
+- GGPLOT es uno de los paquetes incluidos dentro de **tidyverse**.
+
+- Su objetivo: hacer gráficos con una sintáxis en común
+
+- Estructura más básica:
+
+.center[
+.large2[ggplot(<span style='color: #66C2A5;'>data</span>, <span style='color: #FC8D62;'>aes()</span>) + geom_<span style='color: #8DA0CB;'>TipoDeGrafico</span>()]
+]
+
+<span style='color: #66C2A5;'>data</span>: el nombre de nuestro data.frame
+
+<span style='color: #FC8D62;'>aes()</span>: qué variables y en dónde queremos mostrarlas
+
+<span style='color: #8DA0CB;'>TipoDeGrafico</span>: el nombre del gráfico: point, line, col, entre otros
+
+---
+
+# GGPLOT: Grammar of Graphics
+
+- Para modificar distintas partes de nuestros gráficos debemos usar muchas funciones.
+
+- No recomiendo que se las aprendan de memoria: vayan usándolas y las que usen más frecuentemente se las van a acordar de memoria
+
+- Muchas veces es necesario googlear... si se sabe qué queremos hacer, tardamos apenas unos segundos y podemos memorizar cosas más importantes
+
+
+.center[
+.large2[ggplot(data,aes() + geom_TipoDeGrafico() +
+<span style='color: #66C2A5;'>labs()</span>]
+]
+
+- <span style='color: #66C2A5;'>labs()</span>: Indicamos qué texto queremos como título de ejes, gráfico y leyendas.
+
+- Fijense como usamos **+** para agregar "capas" a nuestro gráfico
+
+---
+class: inverse, center, middle
+name: ggplotlibro
+
+# Introducción práctica a ggplot2: http://bit.ly/CienciaDeDatos2020
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>
+
+---
+class: inverse, center, middle
+name: extensionesviz
+
+# Visualizaciones en R: más allá de ggplot
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>
+
+---
+# Visualizaciones en R: más allá de ggplot
+
+- ggplot es, por lejos, el paquete de visualizaciones más famoso de R.
+
+- Pero no es el único
+  * **gganimate** nos permite animar gráficos de ggplot
+  * **leaflet** para hacer mapas interactivos
+  * **plotly** para hacer gráficos interactivos, pero también para hacer interactivos códigos de ggplot!
+  * **tmap** También útil para hacer mapas interactivos
+  * **jtools** entre muchas otras cosas, podemos hacer gráficos de nuestros modelos (usa ggplot por detrás)
+  
+- Incluso existe **shiny** que nos permite hacer dashboards y visualizaciones interactivas combinando cualquiera de las opciones anteriormente descriptas.
+
+- En el programa de Ciencia de Datos del FEPP vamos a ver cada una de estas excepciones
+

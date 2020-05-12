@@ -1,0 +1,66 @@
+# Solución de los ejericios de la clase 2
+library(tidyverse) # Cargamos tidyverse
+# Leemos los datos
+gapminder_df <- read.table(file = "https://raw.githubusercontent.com/martintinch0/CienciaDeDatosParaCuriosos/master/data/gapminder.csv",
+                           sep=';',
+                           header = TRUE,
+                           stringsAsFactors = FALSE)
+
+#1. ¿Cuál es la observación con mayor expectativa al necer de todo el dataset? ¿A qué país corresponde y en qué año?
+gapminder_df %>% 
+  filter(lifeExp==max(lifeExp))
+
+#2. ¿Cuál es la expectativa de vida a nacer promedio por continente en 1952? ¿Y en 2007?
+gapminder_df %>%
+  filter(year %in% c(1952,2007)) %>%
+  select(continent, year, lifeExp) %>%
+  group_by(year,continent) %>%
+  summarise(Exp_prom=mean(lifeExp)) %>%
+  pivot_wider(id_cols = continent,names_from = year,values_from = Exp_prom)
+
+#3. ¿Cuánto aumento la expectativa de vida al nacer por continente entre 2007 y 1952?
+
+gapminder_df %>%
+  group_by(continent, year) %>%
+  summarise(LifeExp_prom = mean(lifeExp)) %>%
+  ungroup() %>%
+  pivot_wider(names_from = year, values_from = LifeExp_prom) %>%
+  mutate(variation=`2007`/`1952`-1) %>%
+  select(`1952`, `2007`, variation) 
+
+#4. ¿Cuál fue el país, por continente, que más aumentó su expectativa de vida al nacer en términos absolutos?
+
+gapminder_df %>%
+  filter(year == "1952" | year == "2007") %>%
+  select(continent, country, year, lifeExp) %>%
+  pivot_wider(names_from = year, values_from = lifeExp) %>%
+  mutate(variacion=`2007`-`1952`) %>%
+  group_by(continent) %>%
+  summarise(highestVar = max(variacion),
+            highestVar_country = country[variacion == highestVar])
+
+#5. Entre 1952 y 2007 ¿Cuál fue el país que más aumento su PIB per cápita? ¿Y por continente?
+
+gapminder_df %>%
+  filter(year == "1952" | year == "2007") %>%
+  select(continent, country, year,gdpPercap) %>%
+  pivot_wider(names_from = year, values_from = gdpPercap) %>%
+  mutate(variacion=`2007`/`1952`-1) %>%
+  group_by(continent) %>%
+  summarise(highestVar = max(variacion),
+            highestVar_country = country[variacion == highestVar])
+
+
+#6. ¿Cuánto aumento el PIB per cápita de Argentina entre 1952 y2007? ¿Y entre 1977 y 2002?
+
+gapminder_df %>%
+  filter(country == "Argentina", year == "1952" | year == "2007") %>%
+  select(country, year, gdpPercap) %>%
+  pivot_wider(names_from = year, values_from = gdpPercap) %>%
+  mutate(variacion=`2007`/`1952`-1)
+
+gapminder_df %>%
+  filter(country == "Argentina", year == "1977" | year == "2007") %>%
+  select(country, year, gdpPercap) %>%
+  pivot_wider(names_from = year, values_from = gdpPercap) %>%
+  mutate(variacion=`2007`/`1977`-1)

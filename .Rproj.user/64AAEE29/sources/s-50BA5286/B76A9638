@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1589299099862.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "B76A9638",
+    "lastKnownWriteTime" : 1589313135,
+    "last_content_update" : 1589313135342,
+    "path" : "~/Documents/CienciaDeDatosClases/IntroAprendizajeAutomatico.Rmd",
+    "project_path" : "IntroAprendizajeAutomatico.Rmd",
+    "properties" : {
+        "cursorPosition" : "199,0",
+        "scrollLine" : "171",
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

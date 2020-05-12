@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Aprendizaje Automático</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Martín Montané" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Aprendizaje Automático
+## Introducción al aprendizaje automático
+### Martín Montané
+### Universidad Torcuato Di Tella (UTDT) | FEPP
+
+---
+
+
+&lt;style type="text/css"&gt;
+# CSS for including pauses in printed PDF output (see bottom of lecture)
+@media print {
+  .has-continuation {
+    display: block !important;
+  }
+}
+.h1{font-size: 50%}
+.large4 { font-size: 400% }
+.large2 { font-size: 200% }
+.small90 { font-size: 90% }
+.small75 { font-size: 75% }
+&lt;/style&gt;
+
+
+# Nuestro camino
+.center[.middle[
+1. [¿A qué llamamos aprendizaje aumático?](#whatisit)
+
+2. [Los rolling stones: árboles de decisión](#decisiontrees)
+
+3. [Árboles de decisiones en R](#decisiontreesinR)
+
+4. [Overfiting y Underfiting](#overandunderfiting)
+
+5. [Ya empieza el ritual: training y testing](#traintest)
+
+6. [Los griegos tenían razón: bagging](#bagging)
+
+7. [Extensiones de aprendizaje automático](#extensiones)
+]]
+---
+class: inverse, center, middle
+name: whatisit
+
+# ¿De qué hablamos cuando decimos aprendizaje automático?
+
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=796px&gt;&lt;/html&gt;
+
+---
+# Qué es Aprendizaje Automático?
+
+.center[.middle[
+&gt; "La capacidad de un programa de aprender a hacer una tarea cada vez mejor en base a la experiencia... Se dice que un programa de computadora aprende de la Experiencia (E) con respecto a una determinada clase de tareas (T) y medida de Performance (P) si la Performance en el conjunto de Tareas mejora conforme se acumula Experiencia"
+&gt; [&lt;footer&gt;--- Tom Mitchell (Machine Learning, 2017)&lt;/footer&gt;](http://profsite.um.ac.ir/~monsefi/machine-learning/pdf/Machine-Learning-Tom-Mitchell.pdf)
+
+]]
+---
+
+  
+# Qué es Aprendizaje Automático?
+
+.center[.middle[
+&lt;iframe src="https://www.youtube.com/embed/zIkBYwdkuTk" width="600" height="500" style="border: none;"&gt;&lt;/iframe&gt;
+]]
+---
+class: inverse, center, middle
+name: decisiontrees
+
+# Los rolling stones: árboles de decisión
+
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=796px&gt;&lt;/html&gt;
+
+---
+# Árboles de decisión
+
+- Son un tipo de algoritmos particular que nos ayudan a **predecir** el valor de una variable en base a u conjunto de otras variables
+
+- Más específico: es un algoritmo que "hace" preguntas con el objetivo de segmentar a todo nuestro dataset en grupos excluyentes entre ellos
+
+-¿Difícil? No tanto: recuerden el *¿Quién es quién?*:
+  * Hombre/Mujer?
+  * Anteojos o no
+  * Pelo negro o no?
+  * y sigue la lista...
+
+- Esto se llama **Recursive Partioning** y es una de las claves de los árboles de decisión
+
+---
+# Árboles de decisión
+
+- En un ejemplo donde yo tuviera una mujer que tuviera anteojos, y solo exitiese una con estas características, mi contrincante ganaría haciendo dos preguntas:
+
+&lt;img src="https://martinmontane.github.io/CienciaDeDatosBook/Figuras/Capitulo%205/WhoIsWho.png"&gt;&lt;/img&gt;
+
+---
+# Árboles de decisión
+
+- Resumiendo: los árboles hacen preguntas para separar a la variable que queremos predecir en el espacio de las variables explicativas
+
+- Esto es simplemente hacer preguntas y separar a los casos en los distintos **nodos**
+
+- Los árboles de decisión **tienen una función que intentan minimizar** a cada paso
+
+- Cambia en distintos tipos de árboles, pero siempre la idea es la misma: separar **al oro de la piedra**
+
+- Además hay otros parámetros que el árbol usa para terminar de hacer preguntas, o quizás no hacer preguntas demasiado particulares. Ya volveremos a este punto 
+
+---
+class: inverse, center, middle
+name: decisiontreesinR
+
+# Árboles de decisión en R
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=796px&gt;&lt;/html&gt;
+---
+# Árboles de decisión en R: C5.0
+
+
+.middle[
+- El **paquete C50** nos permite entrenar árboles de decisión con el algoritmo C5.0, originalmente desarrollado por Ross Quinlan.
+
+- Como veremos en breve, lo que hace este algoritmo a grandes rasgos es preguntarse cómo mejorar **la entropía** en cada uno de los puntos
+
+- Vamos a usar el **dataset de Titanic** para este primer ejemplo.
+
+- Recuerden tener instalado el paquete: `install.packages("C50")`
+
+- Puede nuestro árbol aprender a clasificar a las personas entre superivivientes o no en base a las variables de Género, Edad y Tarifa pagada?
+]
+
+---
+# Árboles de decisión en R: C5.0
+
+&lt;img src="https://martinmontane.github.io/CienciaDeDatosBook/CienciaDeDatosParaCuriosos_files/figure-html/unnamed-chunk-211-1.png"&gt;&lt;/img&gt;
+
+
+---
+# Árboles de decisión en R: C5.0
+
+
+- ¿Qué variable eligió para empezar a separar los datos?
+
+Respuesta: Género ¿Porqué? Porque maximiza **information gain**, la medida "guia" que usa este árbol para elegir que varaible usar.
+
+--
+- ¿Qué otras variables usó?
+
+Respuesta: Edad y tarifa ¿Porqué? Porque maximizan **information gain** en sus respectivos nodos (dentro de los hombres y dentro de las mujeres).
+
+Dicho de otra manera, una vez que nos quedamos con los hombres **la edad es la variable más útil para distinguir sobrevivientes**. Cuando sabemos que son mujeres, **la tarifa es más importante**.
+--
+
+- ¿Cómo quedaron los nodos finales? ¿Observan algún patrón?
+
+Quizás ven algo distinto que yo, pero las mujeres con precio de tarifas caras son una apuesta segura a haberse salvado. Hombres mayores a 9 años, una buena apuesta a no haber sobrevivido. El resto es relativamente mixto
+
+---
+# Árboles de decisión en R: rpart
+
+- El paquete rpart en R tiene implementadas lo Classification And Regression Trees (CART) al estilo de los primeros árboles de decisión de los 80's
+
+- 
+
+---
+#  Ejemplo: Palo de hockey
+.center[.middle[
+![](https://fromtone.com/wp-content/uploads/2019/04/hockeystick-1.jpg)&lt;!-- --&gt;
+]
+]
+---
+
+#  Ejemplo: Elephant graph
+.center[.middle[
+![](https://ichef.bbci.co.uk/news/624/cpsprodpb/71AE/production/_91520192_elephant_chart624_arrow.png)&lt;!-- --&gt;
+]
+]
+---
+
+#  Ejemplo: Elephant graph
+.center[.middle[
+![](https://ichef.bbci.co.uk/news/624/cpsprodpb/71AE/production/_91520192_elephant_chart624_arrow.png)&lt;!-- --&gt;
+]
+]
+---
+
+#  Ejemplo: COVID/19 FT
+.center[.middle[
+![](https://chezvoila.com/wp-content/uploads/2020/04/FT-Deaths.jpg)&lt;!-- --&gt;
+]
+]
+---
+
+#  Ejemplo: Impacto del COVID
+.center[.middle[
+![](https://pbs.twimg.com/media/EXvJRl1UEAEbur5?format=jpg&amp;name=small)&lt;!-- --&gt;
+]
+]
+---
+class: inverse, center, middle
+name: gooddataviz
+
+# ¿Qué hace buena a una visualización de datos?
+
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=796px&gt;&lt;/html&gt;
+
+---
+
+# ¿Qué hace buena a una visualización?
+
+- Es una pregunta ambiciosa: no existe un claro consenso en qué hace a una visualizacón de datos "buena", pero vamos a basarnos en algunos conceptos que Cairo nos brinda [en su libro](https://www.amazon.es/Truthful-Art-Data-Charts-Communication/dp/0321934075)
+
+- Según Cairo (y Enrico Bertini), una visualización es éxitosa porque es:
+
+ * **veraz**: no debe esconder información y ser el resultado de un análisis/investigación "honesto"
+ * **funcional**: debe permitir a los usuarios entenderlo de la manera más simple posible
+ * **atractiva**: una visualización debe buscar atraer la atención mediante un buen diseño estético
+ * **perspicaz**: muestra evidencia que sería difícil de ver de otra manera
+ * **esclarecedora**: nos da evidencia nueva sobre el tema que se analiza
+
+---
+
+# Cuando no se cumple la veracidad
+.center[.middle[
+![](https://pbs.twimg.com/media/EXiOhQ-WkAEjcxF?format=jpg&amp;name=4096x4096)&lt;!-- --&gt;
+]
+]
+---
+
+# Cuando no se cumple la veracidad (cont)
+.center[.middle[
+![](https://pbs.twimg.com/media/D3vqUMnWkAAIcIU?format=jpg&amp;name=small)&lt;!-- --&gt;
+]
+]
+---
+class: inverse, center, middle
+name: ggplot
+
+# GGPLOT: Grammar of Graphics
+
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=796px&gt;&lt;/html&gt;
+
+---
+
+# GGPLOT: Grammar of Graphics
+
+- GGPLOT es uno de los paquetes incluidos dentro de **tidyverse**.
+
+- Su objetivo: hacer gráficos con una sintáxis en común
+
+- Estructura más básica:
+
+.center[
+.large2[ggplot(&lt;span style='color: #66C2A5;'&gt;data&lt;/span&gt;, &lt;span style='color: #FC8D62;'&gt;aes()&lt;/span&gt;) + geom_&lt;span style='color: #8DA0CB;'&gt;TipoDeGrafico&lt;/span&gt;()]
+]
+
+&lt;span style='color: #66C2A5;'&gt;data&lt;/span&gt;: el nombre de nuestro data.frame
+
+&lt;span style='color: #FC8D62;'&gt;aes()&lt;/span&gt;: qué variables y en dónde queremos mostrarlas
+
+&lt;span style='color: #8DA0CB;'&gt;TipoDeGrafico&lt;/span&gt;: el nombre del gráfico: point, line, col, entre otros
+
+---
+
+# GGPLOT: Grammar of Graphics
+
+- Para modificar distintas partes de nuestros gráficos debemos usar muchas funciones.
+
+- No recomiendo que se las aprendan de memoria: vayan usándolas y las que usen más frecuentemente se las van a acordar de memoria
+
+- Muchas veces es necesario googlear... si se sabe qué queremos hacer, tardamos apenas unos segundos y podemos memorizar cosas más importantes
+
+
+.center[
+.large2[ggplot(data,aes() + geom_TipoDeGrafico() +¿Cómo quedaron los nodos finales?
+&lt;span style='color: #66C2A5;'&gt;labs()&lt;/span&gt;]
+]
+
+- &lt;span style='color: #66C2A5;'&gt;labs()&lt;/span&gt;: Indicamos qué texto queremos como título de ejes, gráfico y leyendas.
+
+- Fijense como usamos **+** para agregar "capas" a nuestro gráfico
+
+---
+class: inverse, center, middle
+name: ggplotlibro
+
+# Introducción práctica a ggplot2: http://bit.ly/CienciaDeDatos2020
+
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=796px&gt;&lt;/html&gt;
+
+---
+class: inverse, center, middle
+name: extensionesviz
+
+# Visualizaciones en R: más allá de ggplot
+
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=796px&gt;&lt;/html&gt;
+
+---
+# Visualizaciones en R: más allá de ggplot
+
+- ggplot es, por lejos, el paquete de visualizaciones más famoso de R.
+
+- Pero no es el único
+  * **gganimate** nos permite animar gráficos de ggplot
+  * **leaflet** para hacer mapas interactivos
+  * **plotly** para hacer gráficos interactivos, pero también para hacer interactivos códigos de ggplot!
+  * **tmap** También útil para hacer mapas interactivos
+  * **jtools** entre muchas otras cosas, podemos hacer gráficos de nuestros modelos (usa ggplot por detrás)
+  
+- Incluso existe **shiny** que nos permite hacer dashboards y visualizaciones interactivas combinando cualquiera de las opciones anteriormente descriptas.
+
+- En el programa de Ciencia de Datos del FEPP vamos a ver cada una de estas excepciones
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"highlightSpans": false,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

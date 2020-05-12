@@ -1,0 +1,199 @@
+---
+title: "Aprendizaje Automático"
+subtitle: "Introducción al aprendizaje automático"
+author: "Martín Montané"
+date: "Universidad Torcuato Di Tella (UTDT) | FEPP"
+output:
+  xaringan::moon_reader:
+    css: [default, metropolis, metropolis-fonts]
+    lib_dir: docs/libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      highlightSpans: false
+      countIncrementalSlides: false
+---
+
+```{css, echo=FALSE}
+# CSS for including pauses in printed PDF output (see bottom of lecture)
+@media print {
+  .has-continuation {
+    display: block !important;
+  }
+}
+.h1{font-size: 50%}
+.large4 { font-size: 400% }
+.large2 { font-size: 200% }
+.small90 { font-size: 90% }
+.small75 { font-size: 75% }
+```
+
+
+# Nuestro camino
+.center[.middle[
+1. [¿A qué llamamos aprendizaje aumático?](#whatisit)
+
+2. [Los rolling stones: árboles de decisión](#decisiontrees)
+
+3. [Árboles de decisiones en R](#decisiontreesinR)
+
+<!-- 4. [Ya empieza el ritual: training y testing](#traintest) -->
+
+<!-- 5. [Overfiting y Underfiting](#overandunderfiting) -->
+
+4. [Manos a la obra: machine learning en R](#handson)
+
+<!--6. [Los griegos tenían razón: bagging](#bagging) -->
+
+<!-- 7. [Extensiones de aprendizaje automático](#extensiones) -->
+]]
+---
+class: inverse, center, middle
+name: whatisit
+
+# ¿De qué hablamos cuando decimos aprendizaje automático?
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>
+
+---
+# Qué es Aprendizaje Automático?
+
+.center[.middle[
+> "La capacidad de un programa de aprender a hacer una tarea cada vez mejor en base a la experiencia... Se dice que un programa de computadora aprende de la Experiencia (E) con respecto a una determinada clase de tareas (T) y medida de Performance (P) si la Performance en el conjunto de Tareas mejora conforme se acumula Experiencia"
+> [`r tufte::quote_footer('--- Tom Mitchell (Machine Learning, 2017)')`](http://profsite.um.ac.ir/~monsefi/machine-learning/pdf/Machine-Learning-Tom-Mitchell.pdf)
+
+]]
+---
+
+  
+# Qué es Aprendizaje Automático?
+
+.center[.middle[
+<iframe src="https://www.youtube.com/embed/zIkBYwdkuTk" width="600" height="500" style="border: none;"></iframe>
+]]
+---
+class: inverse, center, middle
+name: decisiontrees
+
+# Los rolling stones: árboles de decisión
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>
+
+---
+# Árboles de decisión
+
+- Son un tipo de algoritmos particular que nos ayudan a **predecir** el valor de una variable en base a u conjunto de otras variables
+
+- Más específico: es un algoritmo que "hace" preguntas con el objetivo de segmentar a todo nuestro dataset en grupos excluyentes entre ellos
+
+-¿Difícil? No tanto: recuerden el *¿Quién es quién?*:
+  * Hombre/Mujer?
+  * Anteojos o no
+  * Pelo negro o no?
+  * y sigue la lista...
+
+- Esto se llama **Recursive Partioning** y es una de las claves de los árboles de decisión
+
+---
+# Árboles de decisión
+
+- En un ejemplo donde yo tuviera una mujer que tuviera anteojos, y solo exitiese una con estas características, mi contrincante ganaría haciendo dos preguntas:
+
+<img src="https://martinmontane.github.io/CienciaDeDatosBook/Figuras/Capitulo%205/WhoIsWho.png"></img>
+
+---
+# Árboles de decisión
+
+- Resumiendo: los árboles hacen preguntas para separar a la variable que queremos predecir en el espacio de las variables explicativas
+
+- Esto es simplemente hacer preguntas y separar a los casos en los distintos **nodos**
+
+- Los árboles de decisión **tienen una función que intentan minimizar** a cada paso
+
+- Cambia en distintos tipos de árboles, pero siempre la idea es la misma: separar **al oro de la piedra**
+
+- Además hay otros parámetros que el árbol usa para terminar de hacer preguntas, o quizás no hacer preguntas demasiado particulares. Ya volveremos a este punto 
+
+---
+class: inverse, center, middle
+name: decisiontreesinR
+
+# Árboles de decisión en R
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>
+---
+# Árboles de decisión en R: C5.0
+
+
+.middle[
+- El **paquete C50** nos permite entrenar árboles de decisión con el algoritmo C5.0, originalmente desarrollado por Ross Quinlan.
+
+- Como veremos en breve, lo que hace este algoritmo a grandes rasgos es preguntarse cómo mejorar **la entropía** en cada uno de los puntos
+
+- Vamos a usar el **dataset de Titanic** para este primer ejemplo.
+
+- Recuerden tener instalado el paquete: `install.packages("C50")`
+
+- Puede nuestro árbol aprender a clasificar a las personas entre superivivientes o no en base a las variables de Género, Edad y Tarifa pagada?
+]
+
+---
+# Árboles de decisión en R: C5.0
+
+<img src="https://martinmontane.github.io/CienciaDeDatosBook/CienciaDeDatosParaCuriosos_files/figure-html/unnamed-chunk-211-1.png"></img>
+
+
+---
+# Árboles de decisión en R: C5.0
+
+
+- ¿Qué variable eligió para empezar a separar los datos?
+
+Respuesta: Género ¿Porqué? Porque maximiza **information gain**, la medida "guia" que usa este árbol para elegir que variable usar.
+
+--
+- ¿Qué otras variables usó?
+
+Respuesta: Edad y tarifa ¿Porqué? Porque maximizan **information gain** en sus respectivos nodos (dentro de los hombres y dentro de las mujeres).
+
+Dicho de otra manera, una vez que nos quedamos con los hombres **la edad es la variable más útil para distinguir sobrevivientes**. Cuando sabemos que son mujeres, **la tarifa es más importante**.
+--
+
+- ¿Cómo quedaron los nodos finales? ¿Observan algún patrón?
+
+Quizás ven algo distinto que yo, pero las mujeres con precio de tarifas caras son una apuesta segura a haberse salvado. Hombres mayores a 9 años, una buena apuesta a no haber sobrevivido. El resto es relativamente mixto
+
+---
+# Árboles de decisión en R: C5.0
+
+- ¿Qué tan bien predice este árbol de decisión? Existen distintas medidas para evaluar esto
+
+- Partamos con la **matriz de confunsión**
+
+```{r echo=FALSE}
+library(magrittr)
+library(kableExtra)
+kable(data.frame(Real=c("Murió","Sobrevivió"),
+           Murió=c(538,133),
+           Sobrevivió=c(80,294)),table.attr = "style='width:30%;' height:'50px;'") %>%
+  kable_styling("striped") %>%
+  add_header_above(c("","Predicción" = 2))
+
+```
+
+- Esto da una "tasa de acierto" (o **accuracy**) del 79,6%. Si hubieramos dicho que morían todos, entonces teníamos una **accuracy** de 59%.
+
+- El lift, es decir la mejora de nuestro modelo, es del 35% (pista: 79.6 / 59 - 1)
+
+- Esta medida la podemos usar para comparar entre cualquier modelo con clasificación categórica.
+
+---
+class: inverse, center, middle
+name: handson
+
+# Manos a la obra https://martinmontane.github.io/CienciaDeDatosBook
+
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>
+
+---
+

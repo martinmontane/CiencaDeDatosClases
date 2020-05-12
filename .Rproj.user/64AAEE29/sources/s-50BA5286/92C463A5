@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1589287219768.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "92C463A5",
+    "lastKnownWriteTime" : 1589291258,
+    "last_content_update" : 1589291258802,
+    "path" : "~/Documents/CienciaDeDatosClases/regresiones.Rmd",
+    "project_path" : "regresiones.Rmd",
+    "properties" : {
+        "cursorPosition" : "10,20",
+        "scrollLine" : "0",
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 6,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}
