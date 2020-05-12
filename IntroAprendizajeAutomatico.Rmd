@@ -31,17 +31,17 @@ output:
 
 # Nuestro camino
 .center[.middle[
-1. [¿A qué llamamos aprendizaje aumático?](#whatisit)
+1. [¿A qué llamamos aprendizaje automático?](#whatisit)
 
 2. [Los rolling stones: árboles de decisión](#decisiontrees)
 
 3. [Árboles de decisiones en R](#decisiontreesinR)
 
+4. [Manos a la obra: machine learning en R](#handson)
+
 <!-- 4. [Ya empieza el ritual: training y testing](#traintest) -->
 
 <!-- 5. [Overfiting y Underfiting](#overandunderfiting) -->
-
-4. [Manos a la obra: machine learning en R](#handson)
 
 <!--6. [Los griegos tenían razón: bagging](#bagging) -->
 
@@ -194,6 +194,4 @@ name: handson
 
 
 <html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>
-
----
 
