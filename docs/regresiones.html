@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Regresiones</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Martín Montané" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Regresiones
+## Los Rolling Stones del análisis de datos
+### Martín Montané
+### Universidad Torcuato Di Tella (UTDT) | FEPP
+
+---
+
+
+&lt;style type="text/css"&gt;
+# CSS for including pauses in printed PDF output (see bottom of lecture)
+@media print {
+  .has-continuation {
+    display: block !important;
+  }
+}
+.large4 { font-size: 400% }
+.large2 { font-size: 200% }
+.small90 { font-size: 90% }
+.small75 { font-size: 75% }
+&lt;/style&gt;
+
+
+# Nuestro camino
+.middle[
+1. [¿Qué es una regresión lineal?](#whatisit)
+
+2. [La regresión hace... promedios](#regpromedios)
+
+3. [¿Cómo podemos hacer regresiones en R?](#howinr)
+
+4. [Regresión lineal múltiple y sus beneficios](#regMult)
+
+5. [Herramientas de visualización y presentación de regresiones](#extensionesReg)
+
+6. [Resumen](#resumen)
+]
+---
+class: inverse, center, middle
+name: whatdataviz
+
+# ¿Qué es una regresión?
+
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=796px&gt;&lt;/html&gt;
+
+---
+
+# ¿Qué es una regresión?
+.middle[
+- Es un modelo (estadístico?) que nos permite resumir las relaciones entre una variable que queremos explicar en función de otro conjunto de variables.
+
+- La regresión más famosa es la **regresión lineal**: nuestra variable depende linealmente del resto de las variables explicativas
+
+- Podemos pensarla desde diferentes ángulos (inferencia, mecánica, geométrica...)
+
+- En esta clase vamos a verla exclusivamente desde el **punto de vista "mecánico"**.
+
+- Para esto vamos a tener que ver explicar qué es el método de **Mínimos Cuadrados Ordinarios (MCO)**
+]
+---
+class: inverse, center, middle
+name: regpromedios
+
+# La regresión hace... promedios
+
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=796px&gt;&lt;/html&gt;
+
+---
+# La regresión hace... promedios
+
+- Mínimos Cuadrados Ordinarios (MCO) es uno de los métodos más comunes para estimar la relación entre el conjunto de nuestras variables explicativas y la variable que queremos explicar
+
+- Lo que hace es muy simple, pero vayamos paso por paso con un ejemplo interesante
+--
+.center[.middle[
+&lt;img src="graficosRegresion/share70older.png" width="600px" height="400px" /&gt;
+]]
+
+---
+
+# La regresión hace... promedios
+
+- ¿Cómo podemos resumir la regresión entre estas dos variables?
+
+- Idea de MCO: encontrar la recta que minimice el error con todas las observaciones 
+
+- Otra forma de verlo: encontrar una recta que mejor describa a los datos que registramos
+
+--
+
+.center[.middle[
+&lt;img src="graficosRegresion/graficoConResiduos.png" width="600px" height="400px" /&gt;
+]]
+
+---
+# La regresión hace... promedios
+
+- ¿Cómo encuentra esta regla? Tiene un objetivo: **minimizar la suma del error cuadrático**
+
+- El error cuadrático no es otra cosa que la sumatoria de los errores entre la predicción y el valor observado... elevado al cuadrado
+
+- Idea importante: minimizar la sumatoria de los errores al cuadrado siempre nos lleva a un promedio
+
+
+```r
+vector &lt;- c(0,2,3,9,1,2,4)
+# mean(vector) El promedio de este vector es 3
+valores &lt;- seq(0,6,by=0.1)
+```
+
+- Vamos a calcular la suma de errores cuadráticos para todos los valores entre 0 y 6, yendo de a 0.1
+
+
+---
+
+# La regresión hace... promedios
+
+- El promedio es el valor que minimiza la suma de errores al cuadrado 
+
+.center[.middle[
+&lt;img src="graficosRegresion/graficoMinimizacionVector.png" width="600px" height="400px" /&gt;
+]]
+
+- Resumiendo: la regresión nos ayuda a encontrar de manera eficiente la relación promedio entre las variables
+---
+class: inverse, center, middle
+name: howinr
+
+# Regresiones en R
+
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=796px&gt;&lt;/html&gt;
+
+---
+
+#  Regresiones en R: funciones claves
+
+- &lt;b&gt;L&lt;/b&gt;inear &lt;b&gt;M&lt;/b&gt;odel **lm(&lt;span style='color: #377eb8;'&gt;formula &lt;/span&gt;, &lt;span style='color: #4daf4a;'&gt;data&lt;/span&gt;)**. Es la función que estima el modelo.
+
+- La &lt;span style='color: #377eb8;'&gt;**formula**&lt;/span&gt; tiene la siguiente sintáxis:
+.center[.middle[
+variableAExplicar ~ variable1 + variable2 ... + variableN
+]]
+
+- &lt;span style='color: #4daf4a;'&gt;**data**&lt;/span&gt; solo contiene nuestro data frame. Las variables en la formula hacen referencia a columnas de nuestro data.frame
+
+- Ejemplo: el dataset **salarios** tiene dos variables: **salario** y **genero** de un conjunto de trabajadores
+
+.center[.middle[
+lm(formula=salarios ~ genero, data = salarios)
+]]
+
+Es equivalente a estimar el siguiente modelo
+
+.center[.middle[
+`\(salario = \beta_0 + \beta_1*genero + \epsilon\)`
+]]
+
+Donde la estimación de `\(\beta_0\)` y `\(\beta_1\)` nos dará la recta que más cerca pasa por el conjunto de puntos. `\(\epsilon\)` es un vector que tiene los desvios entre la recta y los puntos
+
+---
+#  Regresiones en R: funciones claves
+
+.center[.middle[
+
+
+
+```r
+regresion &lt;- lm(formula=Salario ~ Genero, data=datos)
+```
+]]
+
+
+- Para ver los principales resultados de la estimación, tenemos que usar **summary()**
+.small75[
+
+```r
+summary(regresion)
+```
+
+```
+## 
+## Call:
+## lm(formula = Salario ~ Genero, data = datos)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -28633 -13933  -3933   7616 971067 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  28932.9      224.7  128.75   &lt;2e-16 ***
+## GeneroMujer  -6549.3      337.4  -19.41   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 24240 on 20907 degrees of freedom
+## Multiple R-squared:  0.0177,	Adjusted R-squared:  0.01766 
+## F-statistic: 376.8 on 1 and 20907 DF,  p-value: &lt; 2.2e-16
+```
+]
+
+- Presten atención a **(Intercept)** `\(\beta_0\)` y a **GeneroMujer** `\(\beta_1\)`: los valores estimados son 28932,9 y -6459,3
+
+---
+# Regresiones: interpretando la regresión
+- Nuestra variable dependiente era el salario y nuestra variable explicativa era una variable binaria que identificaba el género de las persona
+
+- Lo que nos dijo es que **en promedio** las personas que no son mujeres ganan 28.932,9 pesos
+
+- También **en promedio** las mujeres ganan menos 6.459,3 que los hombres... ¡La regresión es una máquina de hacer promedios!
+
+
+```r
+datos %&gt;% group_by(Genero) %&gt;% summarise(promedio=round(mean(Salario),1))
+```
+
+```
+## # A tibble: 2 x 2
+##   Genero promedio
+##   &lt;fct&gt;     &lt;dbl&gt;
+## 1 Hombre   28933.
+## 2 Mujer    22384.
+```
+
+```r
+28932.9-22383.6
+```
+
+```
+## [1] 6549.3
+```
+
+Exactamente nuestros coeficientes
+---
+
+# Regresiones: interpretando la regresión
+
+- Volvamos al ejemplo de la relación entre la cantidad de muertos y la proporción de personas con 70 o más años
+
+
+.small75[
+
+```r
+regresion &lt;- lm(data=datos, formula=muertesMillones ~ aged_70_older)
+summary(regresion)
+```
+
+```
+## 
+## Call:
+## lm(formula = muertesMillones ~ aged_70_older, data = datos)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -262.79  -98.54  -15.75   14.52  604.14 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)    -32.101     34.864  -0.921    0.361    
+## aged_70_older   16.266      3.793   4.288  6.2e-05 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 142.9 on 64 degrees of freedom
+## Multiple R-squared:  0.2232,	Adjusted R-squared:  0.211 
+## F-statistic: 18.39 on 1 and 64 DF,  p-value: 6.204e-05
+```
+]
+
+- Interpretación: en promedio una unidad más de la variable independiente (en este caso, 1% en la población mayor de 70 años) se asocia en promedio con 16.3 muertos por millones más
+
+---
+
+# p. valor 
+
+- OK: la regresión **siempre** calcula promedios de la relación entre nuestra variable dependiente y nuestras variables explicativas
+
+- Esto lo hace mecánicamente ¿Cómo saber si esa relación surgió al azar?
+
+- En la saluda de las regresiones anteriores van a ver una columna que es **Pr(&gt;|t|)**, allí está calculado nuestro p.valor
+
+- La idea: comparar al parámetro que surgió de nuestros datos versus los que hubieran surgido si en realidad la relación entre nuestras variables no existía
+
+- Comparar lo observado versus el azar ¿Cuándo estamos seguros que nuestros datos no son consistentes con que no exista relación entre las variables? Probablemente nunca.
+
+- Hay cierto (endeble) consenso: 10%, 5%, 1% ? 
+
+- **Siempre** este resultado es condicional al modelo y a los datos con los que lo estimamos
+
+- A veces mejor interpretarlo como algo continuo antes que como algo "discreto"
+
+---
+# Intervalo de confianza
+
+- Idea: ¿cuál es el intervalo en el cual se encontraría nuestro coeficiente si tomaramos infinitas muestras?
+
+- R lo estima por nosotros con la función **confint()**. Solo tenemos que pasarle con qué probabilidad queremos que el coeficiente haya caído entre ese intervalo.
+
+- Mientras mas grande la probabilidad, obviamente más grande el intervalo
+
+.center[.middle[
+
+```r
+confint(regresion,level = 0.97)
+```
+
+```
+##                     1.5 %   98.5 %
+## (Intercept)   -109.481888 45.28087
+## aged_70_older    7.846411 24.68597
+```
+]]
+
+- Si hubieramos hecho 100 veces el muestreo, en el 97% de los casos hubieramos detectado que las mujeres ganaban entre -7.281 y -5.817 pesos que los hombres.
+---
+class: inverse, center, middle
+name: gooddataviz
+
+# Regresión lineal múltiple y sue beneficios
+
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=796px&gt;&lt;/html&gt;
+
+---
+
+# Regresión lineal múltiple
+
+- Hasta ahora trabajamos relaciones entre dos variables, pero en la regresión podemos agregar muchas más variables.
+
+- Puede ser útil para evitar **relaciones espurias** o para identificar **relaciones enmasacaradas**.
+
+- Veamos unos nuevos datos: tasa de divorcios en los Estados Unidos según edad mediana al casarse y tasa de casamientos
+
+---
+
+# Relaciones espurias
+- Ambas variables (edad mediana al casarse y la tasa de casamiento) parecen asociarse negativa y positivamente con la tasa de divorcios
+
+.center[.middle[
+&lt;img src="graficosRegresion/graficoRegresionEspuria.png" width="600px" height="400px" /&gt;
+]]
+
+---
+# Relaciones espurias
+- Qué pasa si ponemos las dos variables explicativas juntas?
+
+.small75[
+
+```r
+regMulti &lt;- lm(WaffleDivorce,formula =  Divorce ~ MedianAgeMarriage + Marriage)
+summary(regMulti)
+```
+
+```
+## 
+## Call:
+## lm(formula = Divorce ~ MedianAgeMarriage + Marriage, data = WaffleDivorce)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -4.5177 -0.9828 -0.0458  0.9224  3.2818 
+## 
+## Coefficients:
+##                   Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)       36.87665    7.66104   4.814 1.58e-05 ***
+## MedianAgeMarriage -0.99965    0.24593  -4.065 0.000182 ***
+## Marriage          -0.05686    0.08053  -0.706 0.483594    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 1.483 on 47 degrees of freedom
+## Multiple R-squared:  0.3634,	Adjusted R-squared:  0.3364 
+## F-statistic: 13.42 on 2 and 47 DF,  p-value: 2.455e-05
+```
+]
+
+- Ahora no solo Marriage cambió de signo, sino que nuestros datos son consistentes con una relación nula entre la tasa de casamiento y de divorcio 
+---
+# Controlando por otras variables
+
+- ¿Por qué cambiaron los coeficientes? Porque en la regresión múltiple controlamos a cada una de las variables explicativas con respecto al resto
+
+
+```r
+regPorPartesMarriage &lt;- lm(WaffleDivorce,formula =  Marriage ~  MedianAgeMarriage)
+WaffleDivorce$residuosEdad &lt;- resid(regPorPartesMarriage)
+regPorPartesMarriage &lt;- lm(WaffleDivorce, formula =  Divorce ~ residuosEdad)
+```
+.small75[
+
+```r
+summary(regPorPartesMarriage)
+```
+
+```
+## 
+## Call:
+## lm(formula = Divorce ~ residuosEdad, data = WaffleDivorce)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -3.6841 -1.3864 -0.0047  1.1876  3.9498 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)   9.68800    0.25929  37.363   &lt;2e-16 ***
+## residuosEdad -0.05686    0.09954  -0.571     0.57    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 1.833 on 48 degrees of freedom
+## Multiple R-squared:  0.006753,	Adjusted R-squared:  -0.01394 
+## F-statistic: 0.3264 on 1 and 48 DF,  p-value: 0.5705
+```
+]
+
+---
+# Controlando por otras variables
+
+- Lo mismo hace con la variable de edad
+
+
+```r
+regPorPartesMedianAge &lt;- lm(WaffleDivorce,formula =  MedianAgeMarriage ~ Marriage)
+WaffleDivorce$residuosMarriage &lt;- resid(regPorPartesMedianAge)
+regPorPartesMedianAge &lt;- lm(WaffleDivorce, formula =  Divorce ~ residuosMarriage)
+```
+.small75[
+
+```r
+summary(regPorPartesMedianAge)
+```
+
+```
+## 
+## Call:
+## lm(formula = Divorce ~ residuosMarriage, data = WaffleDivorce)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -3.4989 -1.1360  0.0917  0.8517  3.5424 
+## 
+## Coefficients:
+##                  Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)        9.6880     0.2292   42.27  &lt; 2e-16 ***
+## residuosMarriage  -0.9996     0.2687   -3.72 0.000522 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 1.621 on 48 degrees of freedom
+## Multiple R-squared:  0.2238,	Adjusted R-squared:  0.2076 
+## F-statistic: 13.84 on 1 and 48 DF,  p-value: 0.000522
+```
+]
+
+---
+
+# Relación enmascarada
+
+- Podemos aprovechar a la regresión múltiple en otro caso muy común: cunado dos relaciones que existen se cancelan entre sí.
+
+- Ejemplo: en biología se discute si hay relación entre energía en la leche materna y el tamaño del cerebro
+
+- Hacemos la regresión simple con una sola variable: no parece haber relación
+
+.small75[
+
+```r
+regresion &lt;- lm(data = milk, formula = kcal.per.g ~ neocortex.perc)
+summary(regresion)
+```
+
+```
+## 
+## Call:
+## lm(formula = kcal.per.g ~ neocortex.perc, data = milk)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.19027 -0.14693 -0.03744  0.15613  0.29959 
+## 
+## Coefficients:
+##                Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept)    0.353332   0.501120   0.705    0.492
+## neocortex.perc 0.004503   0.007389   0.609    0.551
+## 
+## Residual standard error: 0.1764 on 15 degrees of freedom
+## Multiple R-squared:  0.02417,	Adjusted R-squared:  -0.04089 
+## F-statistic: 0.3715 on 1 and 15 DF,  p-value: 0.5513
+```
+]
+
+---
+
+
+# Relación enmascarada
+
+- Agreguemos, ahora, el peso de la madre a la regresión
+
+.small75[
+
+```r
+regresion &lt;- regresion &lt;- lm(data = milk, formula = kcal.per.g ~ neocortex.perc + mass)
+summary(regresion)
+```
+
+```
+## 
+## Call:
+## lm(formula = kcal.per.g ~ neocortex.perc + mass, data = milk)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.19551 -0.10061 -0.02868  0.11914  0.20677 
+## 
+## Coefficients:
+##                 Estimate Std. Error t value Pr(&gt;|t|)  
+## (Intercept)    -0.438441   0.513367  -0.854   0.4075  
+## neocortex.perc  0.017541   0.007870   2.229   0.0427 *
+## mass           -0.005367   0.001992  -2.694   0.0175 *
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.1482 on 14 degrees of freedom
+## Multiple R-squared:  0.3574,	Adjusted R-squared:  0.2656 
+## F-statistic: 3.893 on 2 and 14 DF,  p-value: 0.04526
+```
+]
+
+- Hay una relación positiva y significativa entre el tamaño del neocortex y la energía en la leche marterna!
+
+---
+# Relación enmascarada
+
+- El punto es que existe una relación positiva entre el tamaño del neocortex y el peso de la madre
+
+&lt;img src="graficosRegresion/graficoRelacionEnmascarada.png" width="600px" height="400px" /&gt;
+
+- Pero ambas variables tienen una relación distinta con la cantidad de energía en la leche materna, de tal manera que se cancelan en la regresiones individuales
+---
+class: inverse, center, middle
+name: extensionesReg
+
+# Herramientas para visualizar y exportar nuestras regresiones
+
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=796px&gt;&lt;/html&gt;
+
+---
+
+# Algunas herramientas de R (broom)
+
+- Muchos y muchas de ustedes ya saben y vieron qué es una regresión lineal: cómo puedo aprovechar a R para esto?
+
+- **broom** nos sirve para tener más información - y quizás mejor organizada - sobre nuestra regresión
+
+
+```r
+library(broom)
+```
+.small75[
+
+```r
+tidy(regresion)
+```
+
+```
+## # A tibble: 3 x 5
+##   term           estimate std.error statistic p.value
+##   &lt;chr&gt;             &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+## 1 (Intercept)    -0.438     0.513      -0.854  0.407 
+## 2 neocortex.perc  0.0175    0.00787     2.23   0.0427
+## 3 mass           -0.00537   0.00199    -2.69   0.0175
+```
+
+```r
+glance(regresion)
+```
+
+```
+## # A tibble: 1 x 11
+##   r.squared adj.r.squared sigma statistic p.value    df logLik   AIC   BIC
+##       &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt; &lt;int&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1     0.357         0.266 0.148      3.89  0.0453     3   9.99 -12.0 -8.64
+## # ... with 2 more variables: deviance &lt;dbl&gt;, df.residual &lt;int&gt;
+```
+]
+---
+
+# Algunas herramientas de R (estimatr)
+
+- Podemos usar estimatr para hacer regresiones robustas...
+.small75[
+
+```r
+library(estimatr)
+robustOLS &lt;- lm_robust(kcal.per.g ~ neocortex.perc + mass, data = milk)
+tidy(robustOLS)
+```
+
+```
+##             term     estimate   std.error  statistic     p.value     conf.low
+## 1    (Intercept) -0.438440536 0.478399172 -0.9164743 0.374935684 -1.464504712
+## 2 neocortex.perc  0.017541402 0.007319153  2.3966438 0.031067964  0.001843380
+## 3           mass -0.005366633 0.001747980 -3.0701910 0.008310011 -0.009115677
+##      conf.high df    outcome
+## 1  0.587623641 14 kcal.per.g
+## 2  0.033239424 14 kcal.per.g
+## 3 -0.001617588 14 kcal.per.g
+```
+]
+- Clusterizar errores estandard
+.small75[
+
+```r
+clustered &lt;- lm_robust(kcal.per.g ~ neocortex.perc + mass, data = milk,clusters = clade)
+tidy(clustered)
+```
+
+```
+##             term     estimate   std.error statistic    p.value     conf.low
+## 1    (Intercept) -0.438440536 0.347737965 -1.260836 0.31285023 -1.687654545
+## 2 neocortex.perc  0.017541402 0.005825249  3.011271 0.06573862 -0.002278299
+## 3           mass -0.005366633 0.002398333 -2.237651 0.15488291 -0.015702077
+##     conf.high       df    outcome
+## 1 0.810773474 2.482833 kcal.per.g
+## 2 0.037361103 2.687512 kcal.per.g
+## 3 0.004968811 1.996723 kcal.per.g
+```
+]
+---
+
+# Algunas herramientas de R (huxtable)
+
+
+```r
+require(huxtable)
+```
+
+.small75[
+
+```r
+huxreg(regresion,robustOLS,clustered)
+```
+
+<table class="huxtable" style="border-collapse: collapse; margin-bottom: 2em; margin-top: 2em; width: 50%; margin-left: auto; margin-right: auto;  ">
+<col><col><col><col><tr>
+<td style="vertical-align: top; text-align: center; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.8pt 0pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt;"></td>
+<td style="vertical-align: top; text-align: center; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.8pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">(1)</td>
+<td style="vertical-align: top; text-align: center; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.8pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">(2)</td>
+<td style="vertical-align: top; text-align: center; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.8pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">(3)</td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">(Intercept)</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">-0.438&nbsp;&nbsp;</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">-0.438&nbsp;&nbsp;&nbsp;</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">-0.438&nbsp;</td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;"></td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">(0.513)&nbsp;</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">(0.478)&nbsp;&nbsp;</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">(0.348)</td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">neocortex.perc</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">0.018 *</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">0.018 *&nbsp;</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">0.018&nbsp;</td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;"></td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">(0.008)&nbsp;</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">(0.007)&nbsp;&nbsp;</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">(0.006)</td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">mass</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">-0.005 *</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">-0.005 **</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">-0.005&nbsp;</td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;"></td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">(0.002)&nbsp;</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">(0.002)&nbsp;&nbsp;</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">(0.002)</td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">N</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">17&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">17&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">17&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">R2</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">0.357&nbsp;&nbsp;</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">0.357&nbsp;&nbsp;&nbsp;</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">0.357&nbsp;</td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">logLik</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">9.988&nbsp;&nbsp;</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.8pt 0pt; padding: 4pt 4pt 4pt 4pt;">AIC</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.8pt 0pt; padding: 4pt 4pt 4pt 4pt;">-11.976&nbsp;&nbsp;</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.8pt 0pt; padding: 4pt 4pt 4pt 4pt;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.8pt 0pt; padding: 4pt 4pt 4pt 4pt;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+</tr>
+<tr>
+<td colspan="4" style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 4pt;"> *** p &lt; 0.001;  ** p &lt; 0.01;  * p &lt; 0.05.</td>
+</tr>
+</table>
+
+]
+---
+# Algunas herramientas de R (jtools)
+
+- Comparar coeficientes modelos gráficamente
+
+
+```r
+require(jtools)
+```
+.small75[
+
+```r
+plot_coefs(regresion,robustOLS,clustered,model.names = c("OLS","RobustOLS","ClusteredErrors"))
+```
+]
+&lt;img src="graficosRegresion/graficoJtools.png" width="500px" height="500px" /&gt;
+]
+
+---
+# Algunas herramientas de R (jtools 2)
+
+- Mostrar las predicciones asociadas a valores de nuestras variables explicativas
+
+.center[.small75[
+
+```r
+effect_plot(regresion,plot.points = TRUE,pred = "neocortex.perc")
+```
+
+&lt;img src="regresiones_files/figure-html/unnamed-chunk-35-1.png" width="400px" height="400px" /&gt;
+]]
+
+---
+# Y muchas otras herramientas
+
+- El paquete **AER** para estimar modelos con variables instrumentales
+
+- **PLM** para trabajar con datos de panel
+
+- **rstanarm** para estimar modelos bayesianos
+
+- **vars** para estimar VAR y VECms
+
+- y muchos paquetes más...
+
+- Recomiendo mucho [este link](https://raw.githack.com/uo-ec607/lectures/master/08-regression/08-regression.html#software_requirements) para usuarios más avanzados de regresiones
+
+- Y [este curso](https://github.com/edrubin/EC607S20) para los que estén interesados en inferencia causal en R
+
+---
+class: inverse, center, middle
+name: Resumen
+
+# Resumen de la clase
+
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=796px&gt;&lt;/html&gt;
+
+---
+
+# Resumen
+
+- La regresión puede interpretarse como una forma muy conveniente de calcular promedios entre distintas variables
+
+- Esto lo vimos de una manera muy simple: minimizar la suma de dierencias al cuadrado equivale a buscar un promedio
+
+- El p.valor nos sirve para saber, dado un modelo y nuestras observaciones, en qué medida pudimos encontrar ese parámetro si en realidad no hubiera relación
+
+- El intervalo de confianza nos sirve para saber en qué intervalos de números se encontraría el parámetro estimado si hicieramos un muestreo muchas veces
+
+- La regresión múltiple es una herramienta muy útil: regresa a cada una de las variables explicativas luego de controlar al resto de las variables
+
+- Esto nos puede servir para no caer en relaciones enmascaradas o espurias.
+
+---
+
+# Lecturas para profundizar
+
+- Nivel introductorio: [Big data, Walter Sosa Escudero](https://www.cuspide.com/9789876298995/Big+Data)
+
+- Nivel intermedio (bayesiano): [Statistical Rethinking](https://www.bookdepository.com/es/Statistical-Rethinking-Richard-McElreath/9781482253443?ref=grid-view&amp;qid=1589830731469&amp;sr=1-1)
+
+- Para consultas generales: [Econometric Analysis of Cross Section and Panel Data, Jeffrey Wooldridge](https://mitpress.mit.edu/books/econometric-analysis-cross-section-and-panel-data-second-edition)
+
+- Regresiones e inferencia causal (nivel intermedio/avanzado): [Mastering Metrics: The path from cause to effect, Angrist &amp; Pischke](https://www.amazon.es/Mastering-Metrics-Path-Cause-Effect/dp/0691152845)
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"highlightSpans": false,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

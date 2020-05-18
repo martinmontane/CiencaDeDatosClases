@@ -1,12 +1,12 @@
 ---
 title: "Regresiones"
-subtitle: "La máquina de hacer promedios"
+subtitle: "Los Rolling Stones del análisis de datos"
 author: "Martín Montané"
 date: "Universidad Torcuato Di Tella (UTDT) | FEPP"
 output:
   xaringan::moon_reader:
     css: [default, metropolis, metropolis-fonts]
-    lib_dir: docs/libs
+    lib_dir: libs
     nature:
       highlightStyle: github
       highlightLines: true
@@ -29,19 +29,19 @@ output:
 
 
 # Nuestro camino
-.center[.middle[
+.middle[
 1. [¿Qué es una regresión lineal?](#whatisit)
 
-2. [¿Por qué hacemos regresiones?](#whywedoit)
+2. [La regresión hace... promedios](#regpromedios)
 
 3. [¿Cómo podemos hacer regresiones en R?](#howinr)
 
-4. [La regresión hace... promedios](#regpromedios)
+4. [Regresión lineal múltiple y sus beneficios](#regMult)
 
-5. [Regresión lineal múltiple y sue beneficios](#regL)
+5. [Herramientas de visualización y presentación de regresiones](#extensionesReg)
 
-6. [Visualizando nuestra regresión](#extensionesviz)
-]]
+6. [Resumen](#resumen)
+]
 ---
 class: inverse, center, middle
 name: whatdataviz
@@ -53,205 +53,474 @@ name: whatdataviz
 ---
 
 # ¿Qué es una regresión?
+.middle[
+- Es un modelo (estadístico?) que nos permite resumir las relaciones entre una variable que queremos explicar en función de otro conjunto de variables.
 
-Una regresión lineal consiste en la **estimación** de la relación lineal entre distintas variables a partir de datos
+- La regresión más famosa es la **regresión lineal**: nuestra variable depende linealmente del resto de las variables explicativas
 
-Cuando decimos lineal piensen literalmente en una recta para explicar o resumir la relación entre un conjunto de puntos.
+- Podemos pensarla desde diferentes ángulos (inferencia, mecánica, geométrica...)
 
----
+- En esta clase vamos a verla exclusivamente desde el **punto de vista "mecánico"**.
 
-#  ¿Qué es una visualización de datos? 
-
-- No es una definición exenta de dificultades.
-
-> "Una <b>visualización de datos</b> es una exhibición de datos diseñada para permitir el análisis, la exploración o el descubrimiento"
-> `r tufte::quote_footer('--- Alberto Cairo')`
-
-- Existen muchas más definiciones, pero al final del día hacemos visualizaciones para
-  * *Comunicar* patrones interesantes
-  * *Alentar el descubrimiento y exploracion* de un conjunto de datos
-  * *Detectar patrones en nuestos datos*
-  * *Entender nuestros modelos*
-
-
+- Para esto vamos a tener que ver explicar qué es el método de **Mínimos Cuadrados Ordinarios (MCO)**
+]
 ---
 class: inverse, center, middle
-name: examplesdataviz
+name: regpromedios
 
-# Ejemplos de visualizaciones de datos
+# La regresión hace... promedios
 
 <html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>
 
 ---
-#  Ejemplo: Napoleón en Rusia
+# La regresión hace... promedios
 
+- Mínimos Cuadrados Ordinarios (MCO) es uno de los métodos más comunes para estimar la relación entre el conjunto de nuestras variables explicativas y la variable que queremos explicar
+
+- Lo que hace es muy simple, pero vayamos paso por paso con un ejemplo interesante
+--
 .center[.middle[
-```{r echo=FALSE}
-knitr::include_graphics("http://worldofanalytics.be/upload/images/Minard.jpg")
+```{r echo=FALSE, out.width="600px", out.height="400px"}
+knitr::include_graphics("graficosRegresion/share70older.png")
 ```
-]
-]
----
-#  Ejemplo: Palo de hockey
-.center[.middle[
-```{r echo=FALSE}
-knitr::include_graphics("https://fromtone.com/wp-content/uploads/2019/04/hockeystick-1.jpg")
-```
-]
-]
+]]
+
 ---
 
-#  Ejemplo: Elephant graph
+# La regresión hace... promedios
+
+- ¿Cómo podemos resumir la regresión entre estas dos variables?
+
+- Idea de MCO: encontrar la recta que minimice el error con todas las observaciones 
+
+- Otra forma de verlo: encontrar una recta que mejor describa a los datos que registramos
+
+--
+
 .center[.middle[
-```{r echo=FALSE}
-knitr::include_graphics("https://ichef.bbci.co.uk/news/624/cpsprodpb/71AE/production/_91520192_elephant_chart624_arrow.png")
+```{r echo=FALSE, out.width="600px", out.height="400px"}
+knitr::include_graphics("graficosRegresion/graficoConResiduos.png")
 ```
-]
-]
+]]
+
+---
+# La regresión hace... promedios
+
+- ¿Cómo encuentra esta regla? Tiene un objetivo: **minimizar la suma del error cuadrático**
+
+- El error cuadrático no es otra cosa que la sumatoria de los errores entre la predicción y el valor observado... elevado al cuadrado
+
+- Idea importante: minimizar la sumatoria de los errores al cuadrado siempre nos lleva a un promedio
+
+```{r}
+vector <- c(0,2,3,9,1,2,4)
+# mean(vector) El promedio de este vector es 3
+valores <- seq(0,6,by=0.1)
+```
+
+- Vamos a calcular la suma de errores cuadráticos para todos los valores entre 0 y 6, yendo de a 0.1
+
+
 ---
 
-#  Ejemplo: Elephant graph
+# La regresión hace... promedios
+
+- El promedio es el valor que minimiza la suma de errores al cuadrado 
+
 .center[.middle[
-```{r echo=FALSE}
-knitr::include_graphics("https://ichef.bbci.co.uk/news/624/cpsprodpb/71AE/production/_91520192_elephant_chart624_arrow.png")
+```{r echo=FALSE, out.width="600px", out.height="400px"}
+knitr::include_graphics("graficosRegresion/graficoMinimizacionVector.png")
 ```
-]
-]
+]]
+
+- Resumiendo: la regresión nos ayuda a encontrar de manera eficiente la relación promedio entre las variables
+---
+class: inverse, center, middle
+name: howinr
+
+# Regresiones en R
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>
+
 ---
 
-#  Ejemplo: COVID/19 FT
+#  Regresiones en R: funciones claves
+
+- <b>L</b>inear <b>M</b>odel **lm(<span style='color: #377eb8;'>formula </span>, <span style='color: #4daf4a;'>data</span>)**. Es la función que estima el modelo.
+
+- La <span style='color: #377eb8;'>**formula**</span> tiene la siguiente sintáxis:
 .center[.middle[
-```{r echo=FALSE}
-knitr::include_graphics("https://chezvoila.com/wp-content/uploads/2020/04/FT-Deaths.jpg")
+variableAExplicar ~ variable1 + variable2 ... + variableN
+]]
+
+- <span style='color: #4daf4a;'>**data**</span> solo contiene nuestro data frame. Las variables en la formula hacen referencia a columnas de nuestro data.frame
+
+- Ejemplo: el dataset **salarios** tiene dos variables: **salario** y **genero** de un conjunto de trabajadores
+
+.center[.middle[
+lm(formula=salarios ~ genero, data = salarios)
+]]
+
+Es equivalente a estimar el siguiente modelo
+
+.center[.middle[
+$salario = \beta_0 + \beta_1*genero + \epsilon$
+]]
+
+Donde la estimación de $\beta_0$ y $\beta_1$ nos dará la recta que más cerca pasa por el conjunto de puntos. $\epsilon$ es un vector que tiene los desvios entre la recta y los puntos
+
+---
+#  Regresiones en R: funciones claves
+
+.center[.middle[
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+load("datosSalarios.RData")
+library(tidyverse)
+```
+
+```{r}
+regresion <- lm(formula=Salario ~ Genero, data=datos)
+```
+]]
+
+
+- Para ver los principales resultados de la estimación, tenemos que usar **summary()**
+.small75[
+```{r size="huge"}
+summary(regresion)
 ```
 ]
-]
+
+- Presten atención a **(Intercept)** $\beta_0$ y a **GeneroMujer** $\beta_1$: los valores estimados son 28932,9 y -6459,3
+
+---
+# Regresiones: interpretando la regresión
+- Nuestra variable dependiente era el salario y nuestra variable explicativa era una variable binaria que identificaba el género de las persona
+
+- Lo que nos dijo es que **en promedio** las personas que no son mujeres ganan 28.932,9 pesos
+
+- También **en promedio** las mujeres ganan menos 6.459,3 que los hombres... ¡La regresión es una máquina de hacer promedios!
+
+```{r}
+datos %>% group_by(Genero) %>% summarise(promedio=round(mean(Salario),1))
+```
+```{r}
+28932.9-22383.6
+```
+
+Exactamente nuestros coeficientes
 ---
 
-#  Ejemplo: Impacto del COVID
-.center[.middle[
-```{r echo=FALSE}
-knitr::include_graphics("https://pbs.twimg.com/media/EXvJRl1UEAEbur5?format=jpg&name=small")
+# Regresiones: interpretando la regresión
+
+- Volvamos al ejemplo de la relación entre la cantidad de muertos y la proporción de personas con 70 o más años
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+load("datosCovid.RData")
+```
+.small75[
+```{r}
+regresion <- lm(data=datos, formula=muertesMillones ~ aged_70_older)
+summary(regresion)
 ```
 ]
-]
+
+- Interpretación: en promedio una unidad más de la variable independiente (en este caso, 1% en la población mayor de 70 años) se asocia en promedio con 16.3 muertos por millones más
+
+---
+
+# p. valor 
+
+- OK: la regresión **siempre** calcula promedios de la relación entre nuestra variable dependiente y nuestras variables explicativas
+
+- Esto lo hace mecánicamente ¿Cómo saber si esa relación surgió al azar?
+
+- En la saluda de las regresiones anteriores van a ver una columna que es **Pr(>|t|)**, allí está calculado nuestro p.valor
+
+- La idea: comparar al parámetro que surgió de nuestros datos versus los que hubieran surgido si en realidad la relación entre nuestras variables no existía
+
+- Comparar lo observado versus el azar ¿Cuándo estamos seguros que nuestros datos no son consistentes con que no exista relación entre las variables? Probablemente nunca.
+
+- Hay cierto (endeble) consenso: 10%, 5%, 1% ? 
+
+- **Siempre** este resultado es condicional al modelo y a los datos con los que lo estimamos
+
+- A veces mejor interpretarlo como algo continuo antes que como algo "discreto"
+
+---
+# Intervalo de confianza
+
+- Idea: ¿cuál es el intervalo en el cual se encontraría nuestro coeficiente si tomaramos infinitas muestras?
+
+- R lo estima por nosotros con la función **confint()**. Solo tenemos que pasarle con qué probabilidad queremos que el coeficiente haya caído entre ese intervalo.
+
+- Mientras mas grande la probabilidad, obviamente más grande el intervalo
+
+.center[.middle[
+```{r}
+confint(regresion,level = 0.97)
+```
+]]
+
+- Si hubieramos hecho 100 veces el muestreo, en el 97% de los casos hubieramos detectado que las mujeres ganaban entre -7.281 y -5.817 pesos que los hombres.
 ---
 class: inverse, center, middle
 name: gooddataviz
 
-# ¿Qué hace buena a una visualización de datos?
+# Regresión lineal múltiple y sue beneficios
 
 <html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>
 
 ---
 
-# ¿Qué hace buena a una visualización?
+# Regresión lineal múltiple
 
-- Es una pregunta ambiciosa: no existe un claro consenso en qué hace a una visualizacón de datos "buena", pero vamos a basarnos en algunos conceptos que Cairo nos brinda [en su libro](https://www.amazon.es/Truthful-Art-Data-Charts-Communication/dp/0321934075)
+- Hasta ahora trabajamos relaciones entre dos variables, pero en la regresión podemos agregar muchas más variables.
 
-- Según Cairo (y Enrico Bertini), una visualización es éxitosa porque es:
+- Puede ser útil para evitar **relaciones espurias** o para identificar **relaciones enmasacaradas**.
 
- * **veraz**: no debe esconder información y ser el resultado de un análisis/investigación "honesto"
- * **funcional**: debe permitir a los usuarios entenderlo de la manera más simple posible
- * **atractiva**: una visualización debe buscar atraer la atención mediante un buen diseño estético
- * **perspicaz**: muestra evidencia que sería difícil de ver de otra manera
- * **esclarecedora**: nos da evidencia nueva sobre el tema que se analiza
+- Veamos unos nuevos datos: tasa de divorcios en los Estados Unidos según edad mediana al casarse y tasa de casamientos
 
 ---
 
-# Cuando no se cumple la veracidad
+# Relaciones espurias
+- Ambas variables (edad mediana al casarse y la tasa de casamiento) parecen asociarse negativa y positivamente con la tasa de divorcios
+
 .center[.middle[
+```{r echo=FALSE, out.height="400px", out.width="600px"}
+knitr::include_graphics("graficosRegresion/graficoRegresionEspuria.png")
+```
+]]
+
+---
+# Relaciones espurias
+- Qué pasa si ponemos las dos variables explicativas juntas?
 ```{r echo=FALSE}
-knitr::include_graphics("https://pbs.twimg.com/media/EXiOhQ-WkAEjcxF?format=jpg&name=4096x4096")
+load(url("https://github.com/datalab-UTDT/GIS2/raw/master/Data/WaterDivorce.RData"))
+```
+.small75[
+```{r}
+regMulti <- lm(WaffleDivorce,formula =  Divorce ~ MedianAgeMarriage + Marriage)
+summary(regMulti)
 ```
 ]
-]
----
 
-# Cuando no se cumple la veracidad (cont)
-.center[.middle[
-```{r echo=FALSE}
-knitr::include_graphics("https://pbs.twimg.com/media/D3vqUMnWkAAIcIU?format=jpg&name=small")
+- Ahora no solo Marriage cambió de signo, sino que nuestros datos son consistentes con una relación nula entre la tasa de casamiento y de divorcio 
+---
+# Controlando por otras variables
+
+- ¿Por qué cambiaron los coeficientes? Porque en la regresión múltiple controlamos a cada una de las variables explicativas con respecto al resto
+
+```{r}
+regPorPartesMarriage <- lm(WaffleDivorce,formula =  Marriage ~  MedianAgeMarriage)
+WaffleDivorce$residuosEdad <- resid(regPorPartesMarriage)
+regPorPartesMarriage <- lm(WaffleDivorce, formula =  Divorce ~ residuosEdad)
+```
+.small75[
+```{r}
+summary(regPorPartesMarriage)
 ```
 ]
+
+---
+# Controlando por otras variables
+
+- Lo mismo hace con la variable de edad
+
+```{r}
+regPorPartesMedianAge <- lm(WaffleDivorce,formula =  MedianAgeMarriage ~ Marriage)
+WaffleDivorce$residuosMarriage <- resid(regPorPartesMedianAge)
+regPorPartesMedianAge <- lm(WaffleDivorce, formula =  Divorce ~ residuosMarriage)
+```
+.small75[
+```{r}
+summary(regPorPartesMedianAge)
+```
 ]
+
+---
+
+# Relación enmascarada
+
+- Podemos aprovechar a la regresión múltiple en otro caso muy común: cunado dos relaciones que existen se cancelan entre sí.
+
+- Ejemplo: en biología se discute si hay relación entre energía en la leche materna y el tamaño del cerebro
+
+- Hacemos la regresión simple con una sola variable: no parece haber relación
+```{r echo=FALSE}
+load(url("https://github.com/martintinch0/CienciaDeDatosParaCuriosos/raw/master/data/milk.RData"))
+milk <- milk[complete.cases(milk),]
+```
+.small75[
+```{r}
+regresion <- lm(data = milk, formula = kcal.per.g ~ neocortex.perc)
+summary(regresion)
+```
+]
+
+---
+
+
+# Relación enmascarada
+
+- Agreguemos, ahora, el peso de la madre a la regresión
+
+.small75[
+```{r}
+regresion <- regresion <- lm(data = milk, formula = kcal.per.g ~ neocortex.perc + mass)
+summary(regresion)
+```
+]
+
+- Hay una relación positiva y significativa entre el tamaño del neocortex y la energía en la leche marterna!
+
+---
+# Relación enmascarada
+
+- El punto es que existe una relación positiva entre el tamaño del neocortex y el peso de la madre
+
+```{r echo=FALSE, out.height="400px", out.width="600px"}
+knitr::include_graphics("graficosRegresion/graficoRelacionEnmascarada.png")
+```
+
+- Pero ambas variables tienen una relación distinta con la cantidad de energía en la leche materna, de tal manera que se cancelan en la regresiones individuales
 ---
 class: inverse, center, middle
-name: ggplot
+name: extensionesReg
 
-# GGPLOT: Grammar of Graphics
+# Herramientas para visualizar y exportar nuestras regresiones
 
 <html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>
 
 ---
 
-# GGPLOT: Grammar of Graphics
+# Algunas herramientas de R (broom)
 
-- GGPLOT es uno de los paquetes incluidos dentro de **tidyverse**.
+- Muchos y muchas de ustedes ya saben y vieron qué es una regresión lineal: cómo puedo aprovechar a R para esto?
 
-- Su objetivo: hacer gráficos con una sintáxis en común
+- **broom** nos sirve para tener más información - y quizás mejor organizada - sobre nuestra regresión
 
-- Estructura más básica:
-
-.center[
-.large2[ggplot(<span style='color: #66C2A5;'>data</span>, <span style='color: #FC8D62;'>aes()</span>) + geom_<span style='color: #8DA0CB;'>TipoDeGrafico</span>()]
+```{r}
+library(broom)
+```
+.small75[
+```{r}
+tidy(regresion)
+```
+```{r}
+glance(regresion)
+```
 ]
-
-<span style='color: #66C2A5;'>data</span>: el nombre de nuestro data.frame
-
-<span style='color: #FC8D62;'>aes()</span>: qué variables y en dónde queremos mostrarlas
-
-<span style='color: #8DA0CB;'>TipoDeGrafico</span>: el nombre del gráfico: point, line, col, entre otros
-
 ---
 
-# GGPLOT: Grammar of Graphics
+# Algunas herramientas de R (estimatr)
 
-- Para modificar distintas partes de nuestros gráficos debemos usar muchas funciones.
+- Podemos usar estimatr para hacer regresiones robustas...
+.small75[
+```{r}
+library(estimatr)
+robustOLS <- lm_robust(kcal.per.g ~ neocortex.perc + mass, data = milk)
+tidy(robustOLS)
+```
+]
+- Clusterizar errores estandard
+.small75[
+```{r}
+clustered <- lm_robust(kcal.per.g ~ neocortex.perc + mass, data = milk,clusters = clade)
+tidy(clustered)
+```
+]
+---
 
-- No recomiendo que se las aprendan de memoria: vayan usándolas y las que usen más frecuentemente se las van a acordar de memoria
+# Algunas herramientas de R (huxtable)
 
-- Muchas veces es necesario googlear... si se sabe qué queremos hacer, tardamos apenas unos segundos y podemos memorizar cosas más importantes
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+require(huxtable)
+```
 
+.small75[
+```{r message=FALSE}
+huxreg(regresion,robustOLS,clustered)
+```
+]
+---
+# Algunas herramientas de R (jtools)
 
-.center[
-.large2[ggplot(data,aes() + geom_TipoDeGrafico() +
-<span style='color: #66C2A5;'>labs()</span>]
+- Comparar coeficientes modelos gráficamente
+
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+require(jtools)
+```
+.small75[
+```{r eval=FALSE}
+plot_coefs(regresion,robustOLS,clustered,model.names = c("OLS","RobustOLS","ClusteredErrors"))
+```
+]
+```{r echo=FALSE, out.height="500px", out.width="500px"}
+knitr::include_graphics("graficosRegresion/graficoJtools.png")
+```
 ]
 
-- <span style='color: #66C2A5;'>labs()</span>: Indicamos qué texto queremos como título de ejes, gráfico y leyendas.
+---
+# Algunas herramientas de R (jtools 2)
 
-- Fijense como usamos **+** para agregar "capas" a nuestro gráfico
+- Mostrar las predicciones asociadas a valores de nuestras variables explicativas
+
+.center[.small75[
+```{r eval=TRUE, out.height="400px", out.width="400px"}
+effect_plot(regresion,plot.points = TRUE,pred = "neocortex.perc")
+```
+]]
+
+---
+# Y muchas otras herramientas
+
+- El paquete **AER** para estimar modelos con variables instrumentales
+
+- **PLM** para trabajar con datos de panel
+
+- **rstanarm** para estimar modelos bayesianos
+
+- **vars** para estimar VAR y VECms
+
+- y muchos paquetes más...
+
+- Recomiendo mucho [este link](https://raw.githack.com/uo-ec607/lectures/master/08-regression/08-regression.html#software_requirements) para usuarios más avanzados de regresiones
+
+- Y [este curso](https://github.com/edrubin/EC607S20) para los que estén interesados en inferencia causal en R
 
 ---
 class: inverse, center, middle
-name: ggplotlibro
+name: Resumen
 
-# Introducción práctica a ggplot2: http://bit.ly/CienciaDeDatos2020
+# Resumen de la clase
 
 <html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>
 
 ---
-class: inverse, center, middle
-name: extensionesviz
 
-# Visualizaciones en R: más allá de ggplot
+# Resumen
 
-<html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>
+- La regresión puede interpretarse como una forma muy conveniente de calcular promedios entre distintas variables
+
+- Esto lo vimos de una manera muy simple: minimizar la suma de dierencias al cuadrado equivale a buscar un promedio
+
+- El p.valor nos sirve para saber, dado un modelo y nuestras observaciones, en qué medida pudimos encontrar ese parámetro si en realidad no hubiera relación
+
+- El intervalo de confianza nos sirve para saber en qué intervalos de números se encontraría el parámetro estimado si hicieramos un muestreo muchas veces
+
+- La regresión múltiple es una herramienta muy útil: regresa a cada una de las variables explicativas luego de controlar al resto de las variables
+
+- Esto nos puede servir para no caer en relaciones enmascaradas o espurias.
 
 ---
-# Visualizaciones en R: más allá de ggplot
 
-- ggplot es, por lejos, el paquete de visualizaciones más famoso de R.
+# Lecturas para profundizar
 
-- Pero no es el único
-  * **gganimate** nos permite animar gráficos de ggplot
-  * **leaflet** para hacer mapas interactivos
-  * **plotly** para hacer gráficos interactivos, pero también para hacer interactivos códigos de ggplot!
-  * **tmap** También útil para hacer mapas interactivos
-  * **jtools** entre muchas otras cosas, podemos hacer gráficos de nuestros modelos (usa ggplot por detrás)
-  
-- Incluso existe **shiny** que nos permite hacer dashboards y visualizaciones interactivas combinando cualquiera de las opciones anteriormente descriptas.
+- Nivel introductorio: [Big data, Walter Sosa Escudero](https://www.cuspide.com/9789876298995/Big+Data)
 
-- En el programa de Ciencia de Datos del FEPP vamos a ver cada una de estas excepciones
+- Nivel intermedio (bayesiano): [Statistical Rethinking](https://www.bookdepository.com/es/Statistical-Rethinking-Richard-McElreath/9781482253443?ref=grid-view&qid=1589830731469&sr=1-1)
 
+- Para consultas generales: [Econometric Analysis of Cross Section and Panel Data, Jeffrey Wooldridge](https://mitpress.mit.edu/books/econometric-analysis-cross-section-and-panel-data-second-edition)
+
+- Regresiones e inferencia causal (nivel intermedio/avanzado): [Mastering Metrics: The path from cause to effect, Angrist & Pischke](https://www.amazon.es/Mastering-Metrics-Path-Cause-Effect/dp/0691152845)
