@@ -135,7 +135,7 @@ name: Errors
 ---
 # Trade-off entre esgo y varianza
 
-- Imaginemos que queremos **selccionar** el mejor modelo para predecir. Necesitamos una guía: usemos el &lt;span style='color: #e7298a;'&gt;Mean Square Error (MSE) &lt;/span&gt; 
+- Imaginemos que queremos **seleccionar** el mejor modelo para predecir. Necesitamos una guía: usemos el &lt;span style='color: #e7298a;'&gt;Mean Square Error (MSE) &lt;/span&gt; 
 
 .center[.large2[
 $$ \color{#E7298A}{MSE} = (1/\color{olive}{n})\sum_{i=1}^{\color{olive}{n}}(\color{purple}{y_i} - \color{orange}{\hat{f}(x_i)})^2$$
@@ -431,7 +431,7 @@ name: parametertuning
 ---
 # Optimización de parámetros
 
-- Todos los modelos o algoritmos de aprendizaje automático/estadístico tienen **paramétros**
+- Todos los modelos o algoritmos de aprendizaje automático/estadístico tienen **parámetros**
 
 - Estos parámetros controlan diferentes propiedades de estos modelos.
 
@@ -575,8 +575,8 @@ table(pred,dataTesting %&gt;% pull(REGISTRADO))
 ```
 ##                
 ## pred            No_registrado Registrado
-##   No_registrado           337         71
-##   Registrado               45        103
+##   No_registrado           359         77
+##   Registrado               33         87
 ```
 
 - En base a esta table podemos calcular la accuracy
@@ -588,7 +588,7 @@ sum(diag(tabla))/sum(tabla)
 ```
 
 ```
-## [1] 0.7913669
+## [1] 0.8021583
 ```
 ---
 # Random forest: crossvalidation
