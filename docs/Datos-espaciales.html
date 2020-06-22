@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Análisis espacial</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Martín Montané" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Análisis espacial
+## Introducción al análisis espacial en R
+### Martín Montané
+### Universidad Torcuato Di Tella (UTDT)
+
+---
+
+
+&lt;style type="text/css"&gt;
+# CSS for including pauses in printed PDF output (see bottom of lecture)
+@media print {
+  .has-continuation {
+    display: block !important;
+  }
+}
+.large4 { font-size: 400% }
+.large2 { font-size: 200% }
+.small90 { font-size: 90% }
+.small75 { font-size: 75% }
+&lt;/style&gt;
+
+
+# Nuestro camino
+.middle[
+1. [Análisis espacial](#whatisit)
+
+2. [Tipo de datos espaciales](#vectorandraster)
+
+3. [Sistemas de coordenadas de referencia](#crs)
+
+4. [Simple Features (sf)](#howinr)
+
+5. [Bibliografía y extensiones](#resumen)
+]
+---
+class: inverse, center, middle
+name: whatisit
+
+# ¿Qué es el análisis espacial?
+
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=796px&gt;&lt;/html&gt;
+
+---
+
+# ¿Qué es el Análisis Espacial?
+
+- En un sentido estricto es un conjunto de herramientas que nos permiten analizar **datos geográficos**
+
+- Estos **datos geográficos** no son otra cosa que datos que tienen de manera implícita o explícita una ubicación en la tierra.
+
+* Como veremos, esta característica particular nos requiere estudiar en profundidad:
+
+  + ¿Cómo son representados en la Tierra?
+
+--
+
+  + ¿Cómo se almacenan?
+
+--
+
+  + ¿Cómo se analizan?
+---
+class: inverse, center, middle
+name: vectorandraster
+
+# Tipo de datos espaciales
+
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=796px&gt;&lt;/html&gt;
+---
+# Tipo de datos espaciales
+* Los datos espaciales pueden expresarse en dos modelos clásicos  
+--
+
+1. **Modelo vectorial**. En este modelo los datos espaciales son **puntos**, **lineas** o **polígonos**. La información espacial es expresada como coordenadas de los puntos, inicio y final de las lineas o vértices, en caso de los polígonos.
+
+--
+
+  Ejemplo: accesibilidad a grandes espacios públicos en CABA
+&lt;img src="graficosDatosEspaciales/UsoEspaciosVerdes.png" width="562px" height="400px" style="display: block; margin: auto;" /&gt;
+
+---
+# Tipo de datos espaciales
+2. **Modelo ráster**. En el modelo ráster se divide a un espacio en grillas de igual tamaño. Cada una de estas unidades (a veces llamadas *píxeles* o *celdas*) tienen uno o más valores asociados. Suele ser muy usado, por ejemplo, debido al análisis de imágenes satelitales, pero también, por ejemplo para análisis del uso de la tierra o mostrar la elevación de una superficie.
+
+--
+
+  Ejemplo: elevación de Mendoza
+&lt;img src="graficosDatosEspaciales/AlturaMendoza.png" width="562px" height="400px" style="display: block; margin: auto;" /&gt;
+
+---
+# Archivos de datos espaciales
+
+- Tanto **vectores** como **rasters** tienen tipos de archivos distintos
+
+--
+
+&lt;br&gt;
+
+- Archivos más comunes para **vectores**
+  + Shapefile: De los formatos más ampliamente difundidos. Están compuestos por más de un archivo y es propiedad de ESRI (creadores de ArcGis)&lt;br&gt;
+  + Geojson: Son listas basadas en el standard JSON. **Por definición desde ya hace unos años es obligatorio usar la proyección WGS84**&lt;br&gt;
+  + KLM: Son etiquetas basadas en XML
+
+--
+
+&lt;br&gt;
+- Archivos más comunes para **rasters**
+  + GeoTIFF
+  + JPEG(2000)
+---
+class: inverse, center, middle
+name: crs
+
+# Sistema de coordenada de referencia
+
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=796px&gt;&lt;/html&gt;
+---
+
+# Sistema de coordenada de referencia
+
+- Todos los datos espaciales tienen **implícita o explícitamente una ubicación en la tierra**
+
+- Cuando trabajamos con ellos, siempre tenemos que saber en que *unidad* de medida está expresado.
+
+- Así como si alguien nos dice que algo pesa 10 no podemos saber si son gramos, kilos o toneladas, **un conjunto de coordenadas por sí solas no alcanzan para saber de qué posición en la tierra estamos hablando**.
+
+- Los **Sistemas de Coordenada de Referencia (CRS)** son los encargados de identificarnos la "unidad" en la que están expresados nuestros datos espaciales.
+
+- La principal diferencia entre CRS es que pueden ser Sistemas de Coordenadas Geográficas o Sistemas de Referencia de Coordenadas Proyectadas
+
+---
+# Coordenadas geográficas
+
+- En este caso, las coordenadas usadas son **longitud** y **latitud**. En ambos casos, se trata de la distancia - en grados - contra la "linea" del Meridiano de Greenwich y contra la línea del ecuador, respectivamente
+
+- En general, en estos CRS la tierra se modela como un **elipsoide**.
+
+- Este **elipsoide** puede ajustarse para representar de mejor manera una región del planeta (NAD83 es usado para EE.UU.), o puede representar bien en "promedio" al planeta (WGS84, standard internacional)
+
+- Hay que tener mucho cuidado al hacer procesamiento (tomar distancias, entre otras operaciones) con estos datos porque NO están expresados en una unidad de distancia constante (metros, kilómetros)
+
+---
+# Coordenadas proyectadas
+
+- Independientemente del elipsoide que elijamos, los mapas están en dos dimensiones.
+
+- Esto nos obliga a **proyectar** un objeto tri-dimensional, lo que siempre va a tener algún trade-off.
+
+- **Nunca** vamos a poder representar de manera simultánea a nuestros objetos en las siguientes cuatro dimensiones:
+  + Area
+  + Dirección
+  + Distancia
+  + Forma
+
+- Las coordenadas, en los CRS Proyectados, tienen una unidad "constante", como metros o kilométros.
+
+- En este tipo de coordenadas podemos calcular distancias, centroides o buffers sin grandes complicaciones.
+
+---
+# Pistas para trabajar con CRS
+
+- Los archivos .geojson están **siempre** en la proyección WGS84
+
+- Existen dos formas muy usadas de almacenar información sobre el CRS de nuestros datos. **EPSG Codes** y **proj4string**.
+
+- Los **EPSG Codes** son simplemente un listado de CRS definidos. Por ejemplo, el código 4326 corresponde a WGS84
+
+- **proj4string** resume los parámetros del CRS. El correspondiente al EPSG 4326 es el siguiente texto: *+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs*
+
+- La página https://spatialreference.org/ es un excelente recurso para buscar información sobre sistemas de coordenas de referencia
+
+- Como regla general, si las coordenadas toman valores entre -180,180 entonces no están proyectadas.
+
+---
+class: inverse, center, middle
+name: howinr
+
+# Simple Features (sf)
+
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=796px&gt;&lt;/html&gt;
+---
+# Simple Features (sf)
+
+- R tiene un conjunto de paquetes que nos permiten trabajar con datos espaciales.
+
+- El paquete sf es muy útil para trabajar con datos espaciales vectoriales.
+
+- Para la instalación hay que tener RTools instalado (Windows), y quizás tengan que instalar algunos paquetes adicionales vía Homebrew en MacOS o en la Terminal de Ubuntu. Para más información, https://r-spatial.github.io/sf/
+
+- Lo mejor de sf es que es un data.frame con una columna adicional que contiene las coordeanadas de nuestros datos... podemos aplicar (casi) todas las herramientas del resto de tidyverse.
+
+---
+class: inverse, center, middle
+name: resumen
+
+# Bibliografía y extensiones
+
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=796px&gt;&lt;/html&gt;
+---
+# Bibliografía y extensiones
+
+- El análisis de datos espaciales es una discplina que está avanzando mucho durante las últimas décadas. Aquí van algunas recomendaciones para usar R para análisis espacial, y un resumen del análisis estadístico de datos espaciales para curiosos y curiosas
+
+- [Análisis Espacial en R (notas de clase); Montané](https://martinmontane.github.io/AnalisisEspacialEnR/)
+
+- [Geocomputation with R; Lovelace, Nowosad y Muenchow](https://geocompr.robinlovelace.net/)
+
+- [Spatial Data Science; Pebesma, Bivand](http://r-spatial.org/book)
+
+- [Fundamentos de econometría espacial aplicada; Herrera Gómez](https://aaep.org.ar/publicaciones/download/UnaNuevaEconometria.pdf)
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"highlightSpans": false,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
